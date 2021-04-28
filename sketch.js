@@ -1,21 +1,3 @@
-var song;
-var slider;
-
-function setup() {
-  createCanvas(400, 400);
-  song = loadSound("Backgroundmusic.mp3", loaded);
-  slider = createSlider(0,1,1.5,0.01);
-}
-
-function loaded() {
-song.play();
-}
-
-function draw() {
-  background(150);
-  
-song.setVolume(slider.value());
-}
 class Snake {
   
   constructor() {
@@ -57,6 +39,7 @@ class Snake {
       	return true;
       }
     }
+    
     return false;
   }
   
@@ -79,28 +62,46 @@ class Snake {
   }
 
 }
+var eatSound;
+var startOverSound;
+var laugh;
+var fr = 3;
+var musicRate = 1;
 var song;
 var slider;
+
 let snake;
 let rez = 20;
 let food;
 let w;
 let h;
+
+function loaded() {
+song.play();
+  eatSound = loadSound("Sweet.mp3");
+  startOverSound = loadSound("Fail.mp3");
+  laugh = loadSound("Laugh.mp3");
+}
+
 function setup() {
   createCanvas(600, 400);
   w = floor(width / rez);
   h = floor(height / rez);
   frameRate(5);
+  song = loadSound("Backgroundmusic.mp3", loaded);
+  slider = createSlider(0,1,1.5,0.01);
   snake = new Snake();
   foodLocation();
-    bgcolor = color(400);
+    bgColor = color( random(255), random(255), random(255))
   createP ('');
 }
+
 function foodLocation() {
   let x = floor(random(w));
   let y = floor(random(h));
   food = createVector(x, y);
 }
+
 
 function keyPressed() {
   if (keyCode === LEFT_ARROW) {
@@ -113,13 +114,23 @@ function keyPressed() {
     snake.setDir(0, -1);
   } else if (key == ' ') {
     snake.grow();
+    frameRate(fr);
+    pickLocation();
+    
   }
+  
+  bgColor = color( random(255), random(255), random(255) );
 }
 
 function draw() {
   scale(rez);
-  background(220);
+  background(bgColor);
+  
+song.setVolume(slider.value());
   if (snake.eat(food)) {
+    eatSound.play();
+    fr += 2;
+    musicRate += 0.5;
     foodLocation();
   }
   snake.update();
@@ -127,6 +138,12 @@ function draw() {
 
 
   if (snake.endGame()) {
+  song.stop();
+    startOverSound.play();
+    laugh.play();
+    fr += 2;
+    musicRate += 0.5;
+    foodLocation();
     print("END GAME");
     background(255, 0, 0);
     noLoop();
@@ -136,17 +153,4 @@ function draw() {
   fill(255, 0, 0);
   rect(food.x, food.y, 1, 1);
   
-function setup() {
-  createCanvas(400, 400);
-  song = loadSound("Backgroundmusic.mp3", loaded);
-  slider = createSlider(0,1,1.5,0.01);
-}
-
-function loaded() {
-song.play();
-}
-
-function draw() {
-  background(150);
-}
 }
